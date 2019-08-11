@@ -1,18 +1,84 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="home-view-container">
+    <h1>Adopt a new best friend</h1>
+    {{ animalsCount }}
+    {{ getAllCats.length }}
+    <button class="btn btn-primary" @click="togglePetForm">Add New Pet</button>
+
+    <b-form @submit.prevent="handleSubmit" v-if="showPetForm">
+     <b-form-group id="exampleInputGroup2" label="Pet's Name:" label-for="name">
+        <b-form-input
+          id="name"
+          type="text"
+          v-model="formData.name"
+          required
+          placeholder="Enter name" />
+      </b-form-group>
+
+      <b-form-group id="exampleInputGroup3" label="Species:" label-for="species">
+        <b-form-select id="species" :options="['cats', 'dogs']" required v-model="formData.species" />
+      </b-form-group>
+
+      <b-form-group id="exampleInputGroup2" label="Pet's Age:" label-for="age">
+        <b-form-input
+          id="age"
+          type="number"
+          v-model="formData.age"
+          required
+          placeholder="Enter age" />
+      </b-form-group>
+
+      <b-button type="submit" variant="primary">Submit</b-button>
+      <b-button type="reset" variant="danger">Reset</b-button>
+    </b-form>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'home',
-  components: {
-    HelloWorld
+  data () {
+    return {
+      showPetForm: false,
+      formData: {
+        name: '',
+        age: 0,
+        species: null
+      }
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'animalsCount',
+      'getAllCats'
+    ])
+  },
+  methods: {
+    ...mapActions([
+      'addPet'
+    ]),
+    togglePetForm () {
+      this.showPetForm = !this.showPetForm
+    },
+    handleSubmit () {
+      const { species, age, name } = this.formData
+      const payload = {
+        species,
+        pet: {
+          name,
+          age
+        }
+      }
+      this.addPet(payload)
+      // reset form after submit
+      this.formData = {
+        name: '',
+        age: 0,
+        species: null
+      }
+    }
   }
 }
 </script>
